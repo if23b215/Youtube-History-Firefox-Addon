@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>YouTube Local History</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="title-row">
+      <h1>YouTube History</h1>
+      <span class="badge" id="count-badge">0</span>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-scope="all" role="tab" aria-selected="true">
+        All <span class="tab-count" data-count="all">0</span>
+      </button>
+      <button class="tab" data-scope="normal" role="tab" aria-selected="false">
+        Normal <span class="tab-count" data-count="normal">0</span>
+      </button>
+      <button class="tab private" data-scope="private" role="tab" aria-selected="false">
+        Private <span class="tab-count" data-count="private">0</span>
+      </button>
+    </div>
+
+    <div class="toolbar">
+      <input type="search" id="search" placeholder="Search title or channel..." autocomplete="off">
+      <button id="btn-export" title="Download history as JSON">Export</button>
+      <button id="btn-import" title="Import history from JSON">Import</button>
+      <button id="btn-clear" class="danger" title="Delete history">Clear</button>
+      <input type="file" id="import-file" accept="application/json,.json" hidden>
+    </div>
+  </header>
+
+  <main id="list" class="list"></main>
+
+  <footer class="app-footer">
+    <span id="status">Loading...</span>
+    <span class="storage-note">Stored locally in your Firefox profile</span>
+  </footer>
+
+  <template id="tpl-entry">
+    <article class="entry">
+      <a class="thumb-wrap" target="_blank" rel="noopener">
+        <img class="thumb" loading="lazy" alt="">
+        <span class="kind-pill" hidden>Short</span>
+      </a>
+      <div class="meta">
+        <div class="title-line">
+          <a class="title" target="_blank" rel="noopener"></a>
+          <span class="private-pill" hidden title="Watched in a private window">Private</span>
+        </div>
+        <a class="channel" target="_blank" rel="noopener"></a>
+        <div class="row">
+          <span class="watched-at"></span>
+          <span class="watch-count" hidden></span>
+        </div>
+      </div>
+      <button class="delete" title="Remove from history" aria-label="Remove">&times;</button>
+    </article>
+  </template>
+
+  <script src="popup.js"></script>
+</body>
+</html>

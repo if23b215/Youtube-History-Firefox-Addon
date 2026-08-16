@@ -1,0 +1,54 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Local History",
+  "version": "1.0.0",
+  "description": "Tracks your YouTube watch history locally on your own machine. No Google account required. History persists across browser restarts.",
+  "author": "Jan",
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "youtube-local-history@jan.local",
+      "strict_min_version": "115.0"
+    }
+  },
+
+  "permissions": [
+    "storage",
+    "tabs",
+    "unlimitedStorage"
+  ],
+
+  "host_permissions": [
+    "*://*.youtube.com/*"
+  ],
+
+  "background": {
+    "scripts": ["background.js"]
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["*://www.youtube.com/*", "*://m.youtube.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "YouTube Local History",
+    "default_icon": {
+      "16": "icon.svg",
+      "32": "icon.svg",
+      "48": "icon.svg",
+      "128": "icon.svg"
+    }
+  },
+
+  "icons": {
+    "16": "icon.svg",
+    "32": "icon.svg",
+    "48": "icon.svg",
+    "128": "icon.svg"
+  }
+}
