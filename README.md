@@ -65,4 +65,8 @@ Then drag the `.xpi` into Firefox.
 
 ## Privacy
 
-The only data sent over the network is the thumbnail image request to `i.ytimg.com` when the popup is open. Everything else is stored locally in your Firefox profile.
+The extension never uploads your stored history. Thumbnails load from `i.ytimg.com`; when you open a video or ad-hoc playlist, the selected video IDs are sent to YouTube as part of the page URL. Everything else remains in your local Firefox profile.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
