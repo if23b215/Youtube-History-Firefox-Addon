@@ -5,10 +5,15 @@ const searchEl = document.getElementById("search");
 const countEl = document.getElementById("count-badge");
 const statusEl = document.getElementById("status");
 const tpl = document.getElementById("tpl-entry");
+const playViewEl = document.getElementById("btn-play-view");
+
+const PLAYLIST_MAX_ITEMS = 100;
+const VIDEO_ID_PATTERN = /^[A-Za-z0-9_-]{11}$/;
 
 let allHistory = [];
 let filterText = "";
 let activeScope = "all"; // "all" | "normal" | "private"
+let visibleItems = [];
 
 document.addEventListener("DOMContentLoaded", init);
 
@@ -21,6 +26,10 @@ function bindEvents() {
   searchEl.addEventListener("input", (e) => {
     filterText = e.target.value.trim().toLowerCase();
     render();
+  });
+
+  playViewEl.addEventListener("click", () => {
+    playEntries(visibleItems);
   });
 
   document.querySelectorAll(".tab").forEach((btn) => {
@@ -79,6 +88,9 @@ function render() {
       )
     : scoped;
 
+  visibleItems = items;
+  playViewEl.disabled = items.length === 0;
+
   countEl.textContent = allHistory.length.toLocaleString();
   const scopeLabel =
     activeScope === "all" ? "" : activeScope === "private" ? "private " : "normal ";
@@ -112,13 +124,13 @@ function render() {
   }
 
   const frag = document.createDocumentFragment();
-  for (const entry of items) {
-    frag.appendChild(buildEntryNode(entry));
+  for (let index = 0; index < items.length; index++) {
+    frag.appendChild(buildEntryNode(items[index], index));
   }
   listEl.appendChild(frag);
 }
 
-function buildEntryNode(entry) {
+function buildEntryNode(entry, index) {
   const node = tpl.content.firstElementChild.cloneNode(true);
 
   const thumbWrap = node.querySelector(".thumb-wrap");
@@ -129,6 +141,7 @@ function buildEntryNode(entry) {
   const channel = node.querySelector(".channel");
   const watchedAt = node.querySelector(".watched-at");
   const watchCount = node.querySelector(".watch-count");
+  const playFromHere = node.querySelector(".play-from-here");
   const del = node.querySelector(".delete");
 
   thumbWrap.href = entry.url;
@@ -173,6 +186,12 @@ function buildEntryNode(entry) {
     watchCount.title = `Watched ${entry.watchCount} times`;
   }
 
+  playFromHere.addEventListener("click", (ev) => {
+    ev.preventDefault();
+    ev.stopPropagation();
+    playEntries(visibleItems.slice(index));
+  });
+
   del.addEventListener("click", async (ev) => {
     ev.preventDefault();
     ev.stopPropagation();
@@ -188,6 +207,67 @@ function buildEntryNode(entry) {
   });
 
   return node;
+}
+
+async function playEntries(entries) {
+  if (!entries.length) return;
+
+  const privacyModes = new Set(entries.map((entry) => !!entry.private));
+  if (privacyModes.size > 1) {
+    alert(
+      "This view mixes normal and private history. Choose the Normal or Private tab before starting a playlist."
+    );
+    return;
+  }
+
+  const isPrivatePlaylist = privacyModes.has(true);
+  let isPrivateWindow = false;
+  try {
+    isPrivateWindow = !!browser.extension.inIncognitoContext;
+  } catch (err) {
+    console.warn("Could not determine whether the popup is private:", err);
+  }
+  if (isPrivatePlaylist && !isPrivateWindow) {
+    alert(
+      "Open the extension from a private window to play private-history videos."
+    );
+    return;
+  }
+
+  const validEntries = entries.filter(
+    (entry) => entry && VIDEO_ID_PATTERN.test(entry.id || "")
+  );
+  if (validEntries.length === 0) {
+    alert("None of the selected entries has a valid YouTube video ID.");
+    return;
+  }
+
+  const notices = [];
+  const invalidCount = entries.length - validEntries.length;
+  if (invalidCount > 0) {
+    notices.push(
+      `${invalidCount} ${invalidCount === 1 ? "entry has" : "entries have"} an invalid video ID and will be skipped.`
+    );
+  }
+  if (validEntries.length > PLAYLIST_MAX_ITEMS) {
+    notices.push(
+      `Only the first ${PLAYLIST_MAX_ITEMS} videos will be added to keep the playlist URL manageable.`
+    );
+  }
+  if (notices.length && !confirm(`${notices.join("\n")}\n\nContinue?`)) {
+    return;
+  }
+
+  const playlistEntries = validEntries.slice(0, PLAYLIST_MAX_ITEMS);
+  const videoIds = playlistEntries.map((entry) => entry.id);
+  const url = `https://www.youtube.com/watch_videos?video_ids=${videoIds.join(",")}`;
+
+  try {
+    await browser.tabs.create({ url, active: true });
+  } catch (err) {
+    console.error("Failed to open YouTube playlist:", err);
+    alert("Firefox could not open the YouTube playlist.");
+  }
 }
 
 function formatWhen(ts) {

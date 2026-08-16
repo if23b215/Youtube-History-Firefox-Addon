@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "YouTube Local History",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Tracks your YouTube watch history locally on your own machine. No Google account required. History persists across browser restarts.",
   "author": "Jan",
 

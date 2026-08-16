@@ -10,6 +10,12 @@
     <div class="title-row">
       <h1>YouTube History</h1>
       <span class="badge" id="count-badge">0</span>
+      <button
+        id="btn-play-view"
+        class="play-view"
+        title="Play the videos currently shown, in this order"
+        disabled
+      >&#9654; Play view</button>
     </div>
 
     <div class="tabs" role="tablist">
@@ -55,6 +61,10 @@
         <div class="row">
           <span class="watched-at"></span>
           <span class="watch-count" hidden></span>
+          <button
+            class="play-from-here"
+            title="Play this video and the visible videos after it"
+          >&#9654; From here</button>
         </div>
       </div>
       <button class="delete" title="Remove from history" aria-label="Remove">&times;</button>

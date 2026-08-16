@@ -7,6 +7,7 @@ A Firefox extension that keeps a **local** history of every YouTube video and Sh
 - Tracks every video/Short you actually watch (small delay before recording, so accidental clicks don't pollute the list)
 - Records title, channel, thumbnail, timestamp, and a rewatch counter
 - Popup UI with search, export to JSON, import from JSON, single-entry delete, and clear-all
+- Plays the current filtered view, or any visible entry onward, as an ad-hoc playlist on YouTube's normal watch page
 - Works for both regular videos (`/watch?v=...`) and Shorts (`/shorts/...`)
 - 100% local — uses `browser.storage.local`, no network calls except loading thumbnails from YouTube
 
